@@ -6,6 +6,7 @@ const colors = {
     secondary: '#4F959D',
     tertiary: '#98D2C0',
     background: '#F6F8D5',
+    text:'#205781',
 };
 
 // Custom style interfaces with hover states
