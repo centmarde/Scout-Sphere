@@ -1,7 +1,8 @@
 "use client"
 
 import type React from "react"
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { useNavigate } from "react-router-dom"
 import { Github, Facebook, Instagram } from "lucide-react"
 import { ThemeProvider, useTheme } from "@/theme/theme"
 
@@ -13,6 +14,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 
 interface LoginProps {
   onSwitchToRegister?: () => void;
+  setIsPageLoading?: (isLoading: boolean) => void;
 }
 
 // WelcomeGreeting component
@@ -26,8 +28,9 @@ const WelcomeGreeting = ({ children }: { children: React.ReactNode }) => {
 };
 
 // Wrapper component that uses the theme
-const LoginContent = ({ onSwitchToRegister }: LoginProps) => {
+const LoginContent = ({ onSwitchToRegister, setIsPageLoading }: LoginProps) => {
   const theme = useTheme();
+  const navigate = useNavigate();
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
 
@@ -35,6 +38,16 @@ const LoginContent = ({ onSwitchToRegister }: LoginProps) => {
     e.preventDefault()
     // Handle login logic here
     console.log("Login attempt with:", email, password)
+    
+    // Show loader overlay
+    if (setIsPageLoading) {
+      setIsPageLoading(true);
+      
+      // Navigate after 3 seconds
+      setTimeout(() => {
+        navigate('/home');
+      }, 3000);
+    }
   }
 
   return (
@@ -142,10 +155,10 @@ const LoginContent = ({ onSwitchToRegister }: LoginProps) => {
   );
 };
 
-export default function LoginPage({ onSwitchToRegister }: LoginProps) {
+export default function LoginPage({ onSwitchToRegister, setIsPageLoading }: LoginProps) {
   return (
     <ThemeProvider>
-      <LoginContent onSwitchToRegister={onSwitchToRegister} />
+      <LoginContent onSwitchToRegister={onSwitchToRegister} setIsPageLoading={setIsPageLoading} />
     </ThemeProvider>
   )
 }

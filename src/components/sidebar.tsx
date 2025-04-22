@@ -1,9 +1,15 @@
 "use client"
 
 import * as React from "react"
-import { Bell, Box, Home, LogOut, Menu, Settings, PenToolIcon as Tool, Users, X } from "lucide-react"
+import { Bell, LogOut, Menu, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import theme from "@/theme/theme"
+import Logo from "@/components/ui/logo"
+import NotificationsComponent from "@/components/navbar/notifications"
+import NavItems, { getActiveItem } from "@/components/navbar/navitems"
+import { useNavigate } from "react-router-dom"
+import PerfectScrollbar from 'perfect-scrollbar'
+import 'perfect-scrollbar/css/perfect-scrollbar.css'
 
 interface MainSidebarProps extends React.ComponentPropsWithoutRef<"div"> {
   isMobile?: boolean;
@@ -13,9 +19,67 @@ export function MainSidebar({ isMobile = false, className, ...props }: MainSideb
   const [activeTab, setActiveTab] = React.useState("dashboard")
   const [notificationCount, setNotificationCount] = React.useState(3)
   const [isOpen, setIsOpen] = React.useState(false)
+  const [showNotifications, setShowNotifications] = React.useState(false)
+  const navigate = useNavigate()
   
   // Mobile drawer state
   const [drawerOpen, setDrawerOpen] = React.useState(false)
+  
+  // Create refs for scroll containers
+  const desktopScrollRef = React.useRef<HTMLDivElement>(null);
+  const mobileScrollRef = React.useRef<HTMLDivElement>(null);
+  
+  // Store PerfectScrollbar instances
+  const psInstanceRef = React.useRef<PerfectScrollbar | null>(null);
+  const mobilePsInstanceRef = React.useRef<PerfectScrollbar | null>(null);
+  
+  // Initialize perfect scrollbar after component mounts
+  React.useEffect(() => {
+    // Clean up previous instances
+    if (psInstanceRef.current) {
+      psInstanceRef.current.destroy();
+      psInstanceRef.current = null;
+    }
+    
+    if (mobilePsInstanceRef.current) {
+      mobilePsInstanceRef.current.destroy();
+      mobilePsInstanceRef.current = null;
+    }
+    
+    // Small timeout to ensure DOM is fully rendered
+    setTimeout(() => {
+      // Initialize desktop scrollbar
+      if (desktopScrollRef.current && !isMobile) {
+        psInstanceRef.current = new PerfectScrollbar(desktopScrollRef.current, {
+          wheelSpeed: 2,
+          wheelPropagation: false,
+          minScrollbarLength: 20
+        });
+      }
+      
+      // Initialize mobile drawer scrollbar
+      if (mobileScrollRef.current && isMobile && drawerOpen) {
+        mobilePsInstanceRef.current = new PerfectScrollbar(mobileScrollRef.current, {
+          wheelSpeed: 2,
+          wheelPropagation: false,
+          minScrollbarLength: 20
+        });
+      }
+    }, 100);
+    
+    // Cleanup function
+    return () => {
+      if (psInstanceRef.current) {
+        psInstanceRef.current.destroy();
+        psInstanceRef.current = null;
+      }
+      
+      if (mobilePsInstanceRef.current) {
+        mobilePsInstanceRef.current.destroy();
+        mobilePsInstanceRef.current = null;
+      }
+    };
+  }, [isMobile, drawerOpen]); // Re-initialize when isMobile or drawerOpen changes
 
   const handleTabClick = (tab: string) => {
     setActiveTab(tab)
@@ -23,44 +87,17 @@ export function MainSidebar({ isMobile = false, className, ...props }: MainSideb
   }
 
   const handleNotificationClick = () => {
+    setShowNotifications(!showNotifications)
     setNotificationCount(0)
   }
 
-  const navItems = [
-    {
-      id: "dashboard",
-      label: "Dashboard",
-      icon: Home,
-      href: "#",
-    },
-    {
-      id: "packages",
-      label: "Packages",
-      icon: Box,
-      href: "#",
-    },
-    {
-      id: "maintenance",
-      label: "Maintenance",
-      icon: Tool,
-      href: "#",
-    },
-    {
-      id: "users",
-      label: "Users",
-      icon: Users,
-      href: "#",
-    },
-    {
-      id: "settings",
-      label: "Settings",
-      icon: Settings,
-      href: "#",
-    },
-  ]
+  const handleLogoutClick = () => {
+  /*   navigate("/exit") */
+    navigate("/")
+  }
 
   // Get the current active item
-  const activeItem = navItems.find(item => item.id === activeTab);
+  const activeItem = getActiveItem(activeTab);
 
   if (isMobile) {
     return (
@@ -111,44 +148,37 @@ export function MainSidebar({ isMobile = false, className, ...props }: MainSideb
           style={{ backgroundColor: theme.colors.background }}
         >
           <div className="flex justify-between items-center p-4" style={{ borderBottom: `1px solid ${theme.colors.tertiary}` }}>
-            <h1 className="text-xl font-bold" style={{ color: theme.colors.primary }}>Admin Panel</h1>
+            <Logo size="small" />
             <Button variant="ghost" size="icon" onClick={() => setDrawerOpen(false)}>
               <X className="h-5 w-5" />
             </Button>
           </div>
           
-          <div className="overflow-y-auto h-[calc(100%-60px)]">
-            <nav className="flex flex-col p-2">
-              {navItems.map((item) => (
-                <div key={item.id} className="mb-1">
-                  <a 
-                    href={item.href}
-                    className="flex items-center gap-3 px-4 py-3 rounded-lg cursor-pointer transition-colors"
-                    style={{
-                      backgroundColor: activeTab === item.id ? theme.colors.primary : 'transparent',
-                      color: activeTab === item.id ? theme.colors.background : theme.colors.text
-                    }}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      handleTabClick(item.id);
-                      setDrawerOpen(false);
-                    }}
-                  >
-                    <item.icon className="h-5 w-5" />
-                    <span>{item.label}</span>
-                  </a>
-                </div>
-              ))}
-            </nav>
+          <div ref={mobileScrollRef} className="overflow-y-auto h-[calc(100%-60px)] position-relative">
+            <NavItems 
+              activeTab={activeTab} 
+              onTabClick={(id) => {
+                handleTabClick(id);
+                setDrawerOpen(false);
+              }}
+              padding="p-2"
+            />
           </div>
           
           <div className="absolute bottom-0 w-full p-4" style={{ borderTop: `1px solid ${theme.colors.tertiary}` }}>
-            <Button variant="outline" className="w-full justify-start gap-2" onClick={() => console.log("Logout clicked")}>
+            <Button variant="outline" className="w-full justify-start gap-2" onClick={handleLogoutClick}>
               <LogOut className="h-4 w-4" />
               <span>Logout</span>
             </Button>
           </div>
         </div>
+        
+        {/* Notifications dropdown for mobile */}
+        {showNotifications && (
+          <div className="fixed top-14 right-2 z-50 shadow-lg rounded-lg overflow-hidden border" style={{ borderColor: theme.colors.tertiary }}>
+            <NotificationsComponent onClose={() => setShowNotifications(false)} />
+          </div>
+        )}
         
         {/* Content area padding to account for fixed header and tabs */}
         <div className="pt-[104px]" /> {/* 56px for header + 48px for tabs */}
@@ -158,41 +188,31 @@ export function MainSidebar({ isMobile = false, className, ...props }: MainSideb
   
   return (
     <div 
-      className="flex flex-col h-screen relative w-[280px] overflow-hidden" 
+      className="flex flex-col h-screen w-[280px] overflow-hidden" 
       style={{ 
         backgroundColor: theme.colors.background, 
-        borderRight: `1px solid ${theme.colors.tertiary}`
+        borderRight: `1px solid ${theme.colors.tertiary}`,
+        zIndex: 20
       }}
       {...props}
     >
-      <div className="p-4" style={{ color: theme.colors.primary }}>
-        <h1 className="text-xl font-bold text-center">Admin Panel</h1>
+      <div className="p-4 flex justify-center" style={{ color: theme.colors.primary }}>
+        <Logo />
       </div>
-      <div className="flex-1 overflow-y-auto overflow-x-hidden">
-        <nav className="flex flex-col">
-          {navItems.map((item) => (
-            <div key={item.id} className="mb-1">
-              <a 
-                href={item.href}
-                className="flex items-center gap-3 px-4 py-3 rounded-lg cursor-pointer transition-colors"
-                style={{
-                  backgroundColor: activeTab === item.id ? theme.colors.primary : 'transparent',
-                  color: activeTab === item.id ? theme.colors.background : theme.colors.text
-                }}
-                onClick={(e) => {
-                  e.preventDefault();
-                  handleTabClick(item.id);
-                }}
-              >
-                <item.icon className="h-5 w-5" />
-                <span>{item.label}</span>
-              </a>
-            </div>
-          ))}
-        </nav>
+      <div ref={desktopScrollRef} className="flex-1 overflow-y-auto overflow-x-hidden">
+        <NavItems 
+          activeTab={activeTab} 
+          onTabClick={handleTabClick} 
+        />
+        
+        {/* Notifications section below tabs */}
+        <div className="mt-4 px-2">
+          <NotificationsComponent />
+        </div>
       </div>
+      
       <div className="p-4" style={{ borderTop: `1px solid ${theme.colors.tertiary}` }}>
-        <Button variant="outline" className="w-full justify-start gap-2" onClick={() => console.log("Logout clicked")}>
+        <Button variant="outline" className="w-full justify-start gap-2" onClick={handleLogoutClick}>
           <LogOut className="h-4 w-4" />
           <span>Logout</span>
         </Button>
