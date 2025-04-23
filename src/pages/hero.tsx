@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import LoginPage from '../components/login'
 import RegisterPage from '../components/register'
 import { ThemeProvider, useTheme } from '@/theme/theme'
@@ -8,6 +9,7 @@ import Loader from '../components/loader'
 // We'll create a component that uses the theme
 const ThemedHero = () => {
   const theme = useTheme();
+  const navigate = useNavigate();
   const [showLogin, setShowLogin] = useState(true);
   const [isPageLoading, setIsPageLoading] = useState(false);
   
@@ -19,13 +21,15 @@ const ThemedHero = () => {
     setShowLogin(true);
   };
 
-  // Show loader if page is loading
-  if (isPageLoading) {
-    return <Loader />;
-  }
-
   return (
-    <div className="flex min-h-screen w-full">
+    <div className="flex min-h-screen w-full relative">
+      {/* Loader overlay */}
+      {isPageLoading && (
+        <div className="absolute inset-0 z-50">
+          <Loader />
+        </div>
+      )}
+      
       <div className="relative flex-3 bg-cover bg-center hidden md:block" 
            style={{ backgroundImage: "url('/images/buena.jpg')" }}>
         {/* Overlay */}
@@ -45,7 +49,10 @@ const ThemedHero = () => {
       <div className="flex-2 flex items-center justify-center md:flex-2 flex-1"
            style={{ backgroundColor: theme.colors.background }}>
         {showLogin ? (
-          <LoginPage onSwitchToRegister={handleSwitchToRegister} />
+          <LoginPage 
+            onSwitchToRegister={handleSwitchToRegister} 
+            setIsPageLoading={setIsPageLoading} 
+          />
         ) : (
           <RegisterPage 
             onSwitchToLogin={handleSwitchToLogin} 

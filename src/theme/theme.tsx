@@ -7,6 +7,7 @@ const colors = {
     tertiary: '#98D2C0',
     background: '#F6F8D5',
     text:'#205781',
+    mutedText: '#4F959D',
 };
 
 // Custom style interfaces with hover states

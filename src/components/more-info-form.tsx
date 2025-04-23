@@ -23,6 +23,8 @@ const MoreInfoFormContent = () => {
     e.preventDefault()
     // Handle form submission logic here
     console.log("Form submitted with:", organization, role, phone, interests)
+    // Navigate to home page after form submission
+    navigate('/home');
   }
 
   const handleGoBack = () => {
@@ -31,7 +33,12 @@ const MoreInfoFormContent = () => {
 
   return (
     <div className="flex flex-col w-full max-w-[90%] mx-auto">
-      <div className="mb-4 self-start">
+     
+      
+      <div className="flex items-center justify-center w-full">
+        
+        <Card className="w-full max-w-[80%] bg-[#F6F8D5] border border-[#98D2C0] rounded-lg shadow-md text-sm">
+        <div className="mb-4 self-start">
         <Button 
           onClick={handleGoBack}
           variant="ghost" 
@@ -42,9 +49,6 @@ const MoreInfoFormContent = () => {
           Back
         </Button>
       </div>
-      
-      <div className="flex items-center justify-center w-full">
-        <Card className="w-full max-w-[80%] bg-[#F6F8D5] border border-[#98D2C0] rounded-lg shadow-md text-sm">
           <CardHeader className="space-y-1 text-center relative">
             <CardTitle className="text-2xl font-bold mt-6" style={theme.components.text.heading}>
               Cultural Heritage Preservation
