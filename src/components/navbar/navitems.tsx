@@ -38,12 +38,29 @@ export const navItems: NavItem[] = [
     label: "Maps",
     icon: MapPinned,
     href: "#",
+    children: [
+      {
+        id: "maps-heritages",
+        label: "Heritages",
+        href: "/maps/heritages",
+      },
+      {
+        id: "maps-view",
+        label: "View Map",
+        href: "/maps/view",
+      },
+      {
+        id: "maps-ai",
+        label: "Map with AI",
+        href: "/maps/ai",
+      },
+    ],
   },
   {
     id: "maintenance",
     label: "Maintenance",
     icon: Tool,
-    href: "#",
+    href: "/maintenance",
   },
   {
     id: "3dmodels",

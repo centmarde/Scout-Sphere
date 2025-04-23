@@ -23,7 +23,7 @@ const tourismData = [
     visitors: 12500,
     rating: 4.8,
     popularity: 92,
-    image: "/placeholder.svg?height=80&width=120",
+    image: "/images/buena.jpg?height=80&width=120",
   },
   {
     id: "T002",
@@ -32,7 +32,7 @@ const tourismData = [
     visitors: 10200,
     rating: 4.9,
     popularity: 95,
-    image: "/placeholder.svg?height=80&width=120",
+    image: "/images/buena.jpg?height=80&width=120",
   },
   {
     id: "T003",
@@ -41,7 +41,7 @@ const tourismData = [
     visitors: 9800,
     rating: 4.7,
     popularity: 88,
-    image: "/placeholder.svg?height=80&width=120",
+    image: "/images/buena.jpg?height=80&width=120",
   },
   {
     id: "T004",
@@ -50,7 +50,7 @@ const tourismData = [
     visitors: 8900,
     rating: 4.8,
     popularity: 90,
-    image: "/placeholder.svg?height=80&width=120",
+    image: "/images/buena.jpg?height=80&width=120",
   },
 ]
 
