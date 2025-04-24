@@ -66,7 +66,7 @@ export const navItems: NavItem[] = [
     id: "3dmodels",
     label: "3dModels",
     icon: Box3d,
-    href: "#",
+    href: "/models",
   },
   {
     id: "users",
